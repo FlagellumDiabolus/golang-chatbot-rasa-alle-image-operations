@@ -6,7 +6,7 @@ This is a simple chatbot application written in Go, with natural language proces
 ### **How it Works**
 * User Interaction: Users can interact with the chatbot by typing messages into the input field on the web interface and clicking the "Send" button. The chatbot processes the message and responds accordingly.
 * Message Processing: When a message is sent to the server, it is processed by the ChatHandler function. If the message is identified as a file operation (e.g., saving or retrieving images), it is handled directly. Otherwise, the message is sent to the Rasa server for natural language processing.
-* Rasa Integration: The SendToRasa function sends the message to the Rasa server using an HTTP POST request. Rasa processes the message using its trained machine learning models and returns a response, which is then sent back to the client.
+* Rasa Integration: The chatHandler function sends the message to the Rasa server using an HTTP POST request. Rasa processes the message using its trained machine learning models and returns a response, which is then sent back to the client.
 * Image Operations: If the message is identified as a file operation (e.g., "save image" or "retrieve image"), the appropriate operation is performed. For saving images, the message is processed to extract the image URL and locally given name, and the image is saved in the database. For retrieving images, the locally given name is used to retrieve the corresponding image URL from the database and display the image in the chat.
 
 ### **To run the application locally:**
