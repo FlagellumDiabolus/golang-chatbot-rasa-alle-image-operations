@@ -14,8 +14,8 @@ How to Run
 ### **To run the application locally:**
 
 Clone the repository: git clone https://github.com/yourusername/chatbot.git
-Navigate to the project directory: cd chatbot
+Navigate to the project directory: cd golang-chatbot-alle-image-operations
 Install dependencies: go mod tidy
-Start the application: go run cmd/chatbot-api/main.go
+Start the application: go run cmd/golang-chatbot-alle-image-operations/main.go
 Open a web browser and navigate to http://localhost:8080 to access the chat interface.
 Ensure that you have Go installed on your system and the Rasa server is running and accessible at http://localhost:5005 for the natural language processing to work properly.

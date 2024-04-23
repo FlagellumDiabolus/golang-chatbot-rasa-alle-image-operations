@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  chatbot-api:
+  golang-chatbot-alle-image-operations:
     build:
       context: .
       dockerfile: Dockerfile
