@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+</head>
+<body>
+<div id="chat-container">
+    <div id="chat-messages"></div>
+    <input type="text" id="message-input" placeholder="Type your message here...">
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="saveImage()">Save Image</button>
+    <button onclick="retrieveImage()">Retrieve Image</button>
+</div>
+
+<script>
+    function sendMessage() {
+        var message = document.getElementById("message-input").value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/chat", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                displayMessage(response.response);
+            } else {
+                console.error("Error:", xhr.statusText);
+            }
+        };
+        xhr.send("message=" + encodeURIComponent(message));
+        document.getElementById("message-input").value = "";
+    }
+
+    function saveImage() {
+        var message = "save image"; // Or any other message indicating save image operation
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/chat", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                displayMessage(response.response);
+            } else {
+                console.error("Error:", xhr.statusText);
+            }
+        };
+        xhr.send("message=" + encodeURIComponent(message));
+    }
+
+    function retrieveImage() {
+        var message = "retrieve image"; // Or any other message indicating retrieve image operation
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/chat", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                displayMessage(response.response);
+            } else {
+                console.error("Error:", xhr.statusText);
+            }
+        };
+        xhr.send("message=" + encodeURIComponent(message));
+    }
+
+    function displayMessage(message) {
+        var chatMessages = document.getElementById("chat-messages");
+        var messageElement = document.createElement("div");
+        messageElement.textContent = message;
+        chatMessages.appendChild(messageElement);
+    }
+</script>
+</body>
+</html>
