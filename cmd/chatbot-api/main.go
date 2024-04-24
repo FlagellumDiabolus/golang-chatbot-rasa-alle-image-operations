@@ -1,8 +1,8 @@
 package main
 
 import (
-	"golang-chatbot-alle-image_operations/internal/database"
-	"golang-chatbot-alle-image_operations/internal/server"
+	"chatbot-ai/internal/database"
+	"chatbot-ai/internal/server"
 	"log"
 	"net/http"
 )

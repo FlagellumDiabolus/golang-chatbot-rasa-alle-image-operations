@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"golang-chatbot-alle-image_operations/internal/database"
+	"chatbot-ai/internal/database"
 )
 
 const rasaServerURL = "http://localhost:5005/model/parse"

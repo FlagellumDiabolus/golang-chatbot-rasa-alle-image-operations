@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"golang-chatbot-alle-image_operations/internal/database"
+	"chatbot-ai/internal/database"
 )
 
 func SaveImageHandler(w http.ResponseWriter, r *http.Request) {

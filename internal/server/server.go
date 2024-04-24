@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"golang-chatbot-alle-image_operations/internal/handlers"
+	"chatbot-ai/internal/handlers"
 )
 
 type Server struct {
