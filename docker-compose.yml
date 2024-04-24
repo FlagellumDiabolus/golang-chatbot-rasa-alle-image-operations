@@ -21,7 +21,7 @@ services:
   rasa-server:
     build:
       context: .
-      dockerfile: Dockerfile.rasa
+      dockerfile: rasa-file/Dockerfile
     ports:
       - "5005:5005"
     volumes:

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,12 +22,25 @@ func InitializeDB(dataSourceName string) error {
 		return fmt.Errorf("failed to ping database: %v", err)
 	}
 
+	createTableSQL := `CREATE TABLE IF NOT EXISTS images (
+    	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        filename TEXT NOT NULL,
+        url TEXT NOT NULL
+    );`
+
 	fmt.Println("Connected to the database")
+
+	_, err = db.Exec(createTableSQL)
+	if err != nil {
+		log.Fatalf("Error creating table: %v", err)
+		return err
+	}
+	fmt.Println("Table images has been created.")
 	return nil
 }
 
 func SaveImage(name, url string) error {
-	query := "INSERT INTO images (name, url) VALUES (?, ?)"
+	query := "INSERT INTO images (filename, url) VALUES (?, ?)"
 	_, err := db.Exec(query, name, url)
 	if err != nil {
 		return fmt.Errorf("failed to save image: %v", err)
@@ -36,7 +50,7 @@ func SaveImage(name, url string) error {
 
 func RetrieveImage(name string) (string, error) {
 	var imageURL string
-	query := "SELECT url FROM images WHERE name = ?"
+	query := "SELECT url FROM images WHERE filename = ?"
 	err := db.QueryRow(query, name).Scan(&imageURL)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -48,7 +62,7 @@ func RetrieveImage(name string) (string, error) {
 }
 
 func ListImages() ([]string, error) {
-	query := "SELECT name FROM images"
+	query := "SELECT filename FROM images"
 
 	rows, err := db.Query(query)
 	if err != nil {

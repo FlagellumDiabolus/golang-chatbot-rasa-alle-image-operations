@@ -2,29 +2,36 @@ package handlers
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
-	"strings"
-
-	"chatbot-ai/internal/database"
 )
 
 const rasaServerURL = "http://localhost:5005/model/parse"
 
+type request struct {
+	Message string
+}
+
 func ChatHandler(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		Message string `json:"message"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Failed to parse request body", http.StatusBadRequest)
+	//req := request{}
+	//if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	//	http.Error(w, "Failed to parse request body", http.StatusBadRequest)
+	//	return
+	//}
+
+	reqBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
 		return
 	}
 
-	if !isFileOperation(req.Message) {
+	reqBody := string(reqBytes)
+
+	if !isFileOperation(reqBody) {
 		payload := map[string]string{
-			"text": req.Message,
+			"text": reqBody,
 		}
 		payloadBytes, err := json.Marshal(payload)
 		if err != nil {
@@ -34,7 +41,9 @@ func ChatHandler(w http.ResponseWriter, r *http.Request) {
 
 		resp, err := http.Post(rasaServerURL, "application/json", bytes.NewReader(payloadBytes))
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to send request to Rasa server: %v", err), http.StatusInternalServerError)
+			//http.Error(w, fmt.Sprintf("Failed to send request to Rasa server: %v", err), http.StatusInternalServerError)
+			fmt.Fprintf(w, "Connection to rasa not there, handling the non-rasa way\n")
+			NonRasaWay(w, reqBody)
 			return
 		}
 		defer resp.Body.Close()
@@ -56,85 +65,23 @@ func ChatHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"response": response})
 	} else {
-		processFileOperation(w, req.Message)
+		processFileOperation(w, reqBody)
 	}
 }
 
-func isFileOperation(message string) bool {
-	return strings.Contains(strings.ToLower(message), "save") ||
-		strings.Contains(strings.ToLower(message), "retrieve") ||
-		strings.Contains(strings.ToLower(message), "get")
-}
-
-func processFileOperation(w http.ResponseWriter, message string) {
-	switch {
-	case strings.Contains(strings.ToLower(message), "save"):
-		saveImage(w, message)
-	case strings.Contains(strings.ToLower(message), "retrieve") || strings.Contains(strings.ToLower(message), "get"):
-		retrieveImage(w, message)
-	default:
-		http.Error(w, "File operation not supported", http.StatusBadRequest)
-	}
-}
-
-func saveImage(w http.ResponseWriter, message string) {
-	imageName := extractImageName(message)
-	if imageName == "" {
-		http.Error(w, "Image name not provided", http.StatusBadRequest)
-		return
-	}
-
-	imageURL := extractImageURL(message)
-	if imageURL == "" {
-		http.Error(w, "Image URL not provided", http.StatusBadRequest)
-		return
-	}
-
-	err := database.SaveImage(imageName, imageURL)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to save image: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	response := "Image saved successfully."
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"response": response})
-}
-
-func retrieveImage(w http.ResponseWriter, message string) {
-	imageName := extractImageName(message)
-	if imageName == "" {
-		http.Error(w, "Image name not provided", http.StatusBadRequest)
-		return
-	}
-
-	imageURL, err := database.RetrieveImage(imageName)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			http.Error(w, fmt.Sprintf("Image '%s' not found", imageName), http.StatusNotFound)
+// no Rasa dependency
+func NonRasaWay(w http.ResponseWriter, message string) {
+	if isFileOperation(message) {
+		res := processFileOperation(w, message)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"response": "%s"}`, res)
+		_, err := w.Write([]byte(res))
+		if err != nil {
 			return
 		}
-		http.Error(w, fmt.Sprintf("Failed to retrieve image: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	response := fmt.Sprintf("Retrieved image link: %s", imageURL)
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"response": response})
-}
-
-func extractImageName(message string) string {
-	parts := strings.Fields(message)
-	if len(parts) < 3 {
-		return ""
-	}
-	return parts[2]
-}
-
-func extractImageURL(message string) string {
-	parts := strings.Fields(message)
-	if len(parts) < 2 {
-		return ""
-	}
-	return parts[1]
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, `{"response": "You said: %s"}`, message)
 }

@@ -8,10 +8,10 @@ EXPOSE 5005
 WORKDIR /app
 
 # Copy the Rasa files into the container
-COPY . .
+COPY .. .
 
 # Install additional dependencies (if any)
-RUN pip install -r requirements.txt
+#RUN py -m pip install -r requirements.txt
 
 # Start the Rasa server
 CMD ["run", "-m", "models", "--enable-api", "--cors", "*", "--debug"]

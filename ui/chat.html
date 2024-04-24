@@ -17,58 +17,85 @@
 <script>
     function sendMessage() {
         var message = document.getElementById("message-input").value;
+        displayUserMessage(message);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/chat", true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onload = function() {
             if (xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
-                displayMessage(response.response);
+                displayBotResponse(response.response);
             } else {
-                console.error("Error:", xhr.statusText);
+                displayError("Failed to send message");
             }
+        };
+        xhr.onerror = function() {
+            displayError("Network error occurred");
         };
         xhr.send("message=" + encodeURIComponent(message));
         document.getElementById("message-input").value = "";
     }
 
     function saveImage() {
-        var message = "save image"; // Or any other message indicating save image operation
+        var message = "save image";
+        displayUserMessage(message);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/chat", true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onload = function() {
             if (xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
-                displayMessage(response.response);
+                displayBotResponse(response.response);
             } else {
-                console.error("Error:", xhr.statusText);
+                displayError("Failed to save image");
             }
+        };
+        xhr.onerror = function() {
+            displayError("Network error occurred");
         };
         xhr.send("message=" + encodeURIComponent(message));
     }
 
     function retrieveImage() {
-        var message = "retrieve image"; // Or any other message indicating retrieve image operation
+        var message = "retrieve image";
+        displayUserMessage(message);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/chat", true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onload = function() {
             if (xhr.status === 200) {
                 var response = JSON.parse(xhr.responseText);
-                displayMessage(response.response);
+                displayBotResponse(response.response);
             } else {
-                console.error("Error:", xhr.statusText);
+                displayError("Failed to retrieve image");
             }
+        };
+        xhr.onerror = function() {
+            displayError("Network error occurred");
         };
         xhr.send("message=" + encodeURIComponent(message));
     }
 
-    function displayMessage(message) {
+    function displayUserMessage(message) {
         var chatMessages = document.getElementById("chat-messages");
         var messageElement = document.createElement("div");
-        messageElement.textContent = message;
+        messageElement.textContent = "You: " + message;
         chatMessages.appendChild(messageElement);
+    }
+
+    function displayBotResponse(response) {
+        var chatMessages = document.getElementById("chat-messages");
+        var messageElement = document.createElement("div");
+        messageElement.textContent = "Bot: " + response;
+        chatMessages.appendChild(messageElement);
+    }
+
+    function displayError(error) {
+        var chatMessages = document.getElementById("chat-messages");
+        var errorElement = document.createElement("div");
+        errorElement.textContent = "Error: " + error;
+        errorElement.style.color = "red";
+        chatMessages.appendChild(errorElement);
     }
 </script>
 </body>

@@ -18,7 +18,6 @@ func NewServer() *Server {
 
 func (s *Server) SetupRoutes() {
 	s.mux.HandleFunc("/chat", handlers.ChatHandler)
-
 	s.mux.HandleFunc("/save", handlers.SaveImageHandler)
 	s.mux.HandleFunc("/retrieve", handlers.RetrieveImageHandler)
 	s.mux.HandleFunc("/all", handlers.ListImagesHandler)
